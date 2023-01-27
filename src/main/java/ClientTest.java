@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Bundle;
@@ -65,5 +66,17 @@ public class ClientTest {
     MethodOutcome execute1 = client.delete().resourceById(id).execute();
     OperationOutcome operationOutcome = (OperationOutcome) execute1.getOperationOutcome();
     System.out.println(jsonParser.encodeResourceToString(operationOutcome));
+
+    try {
+      Patient patientAfterDeletion = client.read().resource(Patient.class).withId(id.getIdPart())
+          .execute();
+    }
+    catch (ResourceGoneException e) {
+      System.err.println("Resource: Patient/" + id.getIdPart() + " was deleted");
+    }
+
+    // search by url
+    client.search().byUrl("Patient?name=Patrick&name=Fritz").execute();
+
   }
 }
