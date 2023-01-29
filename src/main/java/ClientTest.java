@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -23,6 +24,7 @@ public class ClientTest {
 
     // Create a client
     IGenericClient client = ctx.newRestfulGenericClient("https://hapi.fhir.org/baseR4");
+    client.registerInterceptor(new LoggingInterceptor());
 
     // Read a patient with the given ID
     Patient patient = client.read().resource(Patient.class).withId("example").execute();
